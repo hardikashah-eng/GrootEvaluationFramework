@@ -1,0 +1,42 @@
+# Two arms with grippers on a fixed base. PLACEHOLDER NUMBERS: replace with your robot's values.
+schema_version: 1
+name: bimanual_example
+template: bimanual
+embodiment_tag: new_embodiment
+frames: {base: base_link, quat_order: wxyz}
+timing: {control_hz: 50, policy_hz: 10, action_horizon: 16, max_latency_ms: 100}
+safety: {max_action_rate: 0.05, velocity_scale: 0.3}
+assets: {urdf: assets/bimanual/robot.urdf}
+groups:
+  - name: left_arm
+    kind: arm
+    joint_defaults: {max_velocity: 2.0, effort_limit: 30, stiffness: 100, damping: 10}
+    joints:
+      - {name: left_waist, limits: [-3.14, 3.14]}
+      - {name: left_shoulder, limits: [-1.88, 1.99]}
+      - {name: left_elbow, limits: [-2.15, 1.6]}
+      - {name: left_forearm_roll, limits: [-3.14, 3.14]}
+      - {name: left_wrist_angle, limits: [-1.75, 2.15]}
+      - {name: left_wrist_rotate, limits: [-3.14, 3.14]}
+  - name: left_gripper
+    kind: gripper
+    robot_range: [0.0, 1.0]
+    joints: [{name: left_gripper_joint, limits: [0.0, 1.0]}]
+  - name: right_arm
+    kind: arm
+    joint_defaults: {max_velocity: 2.0, effort_limit: 30, stiffness: 100, damping: 10}
+    joints:
+      - {name: right_waist, limits: [-3.14, 3.14]}
+      - {name: right_shoulder, limits: [-1.88, 1.99]}
+      - {name: right_elbow, limits: [-2.15, 1.6]}
+      - {name: right_forearm_roll, limits: [-3.14, 3.14]}
+      - {name: right_wrist_angle, limits: [-1.75, 2.15]}
+      - {name: right_wrist_rotate, limits: [-3.14, 3.14]}
+  - name: right_gripper
+    kind: gripper
+    robot_range: [0.0, 1.0]
+    joints: [{name: right_gripper_joint, limits: [0.0, 1.0]}]
+cameras:
+  - {name: top, width: 640, height: 480, fps: 30, intrinsics: {fx: 600.0, fy: 600.0, cx: 320.0, cy: 240.0}}
+  - {name: left_wrist, width: 640, height: 480, fps: 30, intrinsics: {fx: 400.0, fy: 400.0, cx: 320.0, cy: 240.0}}
+  - {name: right_wrist, width: 640, height: 480, fps: 30, intrinsics: {fx: 400.0, fy: 400.0, cx: 320.0, cy: 240.0}}

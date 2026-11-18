@@ -22,6 +22,8 @@ isaaclab = ["gymnasium>=0.29"]
 video = ["opencv-python>=4.8"]
 # Reading Isaac Lab / robomimic HDF5 demonstrations (groot-twin convert-check, convert).
 hdf5 = ["h5py>=3.9", "opencv-python>=4.8"]
+# MuJoCo engine cross-check and the robot kit's twin jog test.
+mujoco = ["mujoco>=3.1"]
 
 [project.scripts]
 groot-eval = "groot_eval.cli:main"

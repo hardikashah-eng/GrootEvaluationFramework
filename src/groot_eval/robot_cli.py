@@ -14,6 +14,8 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+from groot_eval.robot_kit.cli import register_kit
+
 Register = Callable[[argparse._SubParsersAction], None]
 
 
@@ -642,7 +644,7 @@ def register_rig(sub: argparse._SubParsersAction) -> None:
 
 
 REGISTRARS: list[Register] = [register_actuators, register_scheduler, register_bridge, register_profiles,
-                              register_treadmill, register_rig]
+                              register_treadmill, register_rig, register_kit]
 
 
 def build_parser() -> argparse.ArgumentParser:

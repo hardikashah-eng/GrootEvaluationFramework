@@ -1,0 +1,59 @@
+# Humanoid upper body (G1-style joint layout). PLACEHOLDER NUMBERS: replace every limit, gain, camera
+# value and topic with your robot's datasheet, URDF and calibration before L2. Legs are left to the
+# robot's own lower-body controller, as in GR00T's humanoid configs; add leg groups to drive them.
+schema_version: 1
+name: humanoid_example
+template: humanoid
+embodiment_tag: new_embodiment
+frames: {base: pelvis, quat_order: wxyz}
+timing: {control_hz: 50, policy_hz: 10, action_horizon: 16, max_latency_ms: 120}
+safety: {max_action_rate: 0.1, velocity_scale: 0.3}
+assets: {urdf: assets/humanoid_example/robot.urdf, usd: null, mjcf: assets/humanoid_example/robot.xml}
+groups:
+  - name: waist
+    kind: waist
+    joint_defaults: {max_velocity: 3.0, effort_limit: 88, stiffness: 200, damping: 5}
+    joints:
+      - {name: waist_yaw_joint, limits: [-2.6, 2.6]}
+      - {name: waist_roll_joint, limits: [-0.52, 0.52]}
+      - {name: waist_pitch_joint, limits: [-0.52, 0.52]}
+  - name: left_arm
+    kind: arm
+    joint_defaults: {max_velocity: 3.0, effort_limit: 25, stiffness: 40, damping: 2}
+    joints:
+      - {name: left_shoulder_pitch_joint, limits: [-3.08, 2.67]}
+      - {name: left_shoulder_roll_joint, limits: [-1.58, 2.25]}
+      - {name: left_shoulder_yaw_joint, limits: [-2.61, 2.61]}
+      - {name: left_elbow_joint, limits: [-1.04, 2.09]}
+      - {name: left_wrist_roll_joint, limits: [-1.97, 1.97]}
+      - {name: left_wrist_pitch_joint, limits: [-1.61, 1.61]}
+      - {name: left_wrist_yaw_joint, limits: [-1.61, 1.61]}
+  - name: right_arm
+    kind: arm
+    joint_defaults: {max_velocity: 3.0, effort_limit: 25, stiffness: 40, damping: 2}
+    joints:
+      - {name: right_shoulder_pitch_joint, limits: [-3.08, 2.67]}
+      - {name: right_shoulder_roll_joint, limits: [-2.25, 1.58]}
+      - {name: right_shoulder_yaw_joint, limits: [-2.61, 2.61]}
+      - {name: right_elbow_joint, limits: [-1.04, 2.09]}
+      - {name: right_wrist_roll_joint, limits: [-1.97, 1.97]}
+      - {name: right_wrist_pitch_joint, limits: [-1.61, 1.61]}
+      - {name: right_wrist_yaw_joint, limits: [-1.61, 1.61]}
+  - name: left_hand
+    kind: gripper
+    robot_range: [0.0, 100.0]   # driver units: 0 open, 100 closed
+    joints: [{name: left_hand_joint, limits: [0.0, 1.0]}]
+  - name: right_hand
+    kind: gripper
+    robot_range: [0.0, 100.0]
+    joints: [{name: right_hand_joint, limits: [0.0, 1.0]}]
+cameras:
+  - name: ego_view
+    width: 640
+    height: 480
+    fps: 30
+    color_order: bgr            # many ROS drivers publish bgr8
+    intrinsics: {fx: 380.0, fy: 380.0, cx: 320.0, cy: 240.0}
+    parent_frame: head_link
+    xyz: [0.06, 0.0, 0.43]
+    quat: [1.0, 0.0, 0.0, 0.0]
