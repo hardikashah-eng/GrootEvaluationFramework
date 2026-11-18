@@ -11,6 +11,8 @@ Use it like any Isaac Lab actuator in an articulation config::
         ages_hours=[0, 2920, 8760],            # environments are split evenly across these ages
         fault_config="configs/faults/arm3_single.yaml", horizon_steps=1000,
         motor_model="profiles/g1-0042/legs_motor.npz",   # optional learned actuator net
+        drive_chain={"delay_steps_min": 1, "delay_steps_max": 3, "drop_prob": 0.002,   # optional, always-on
+                     "current_tau_s": 0.002, "linkage": {4: [[-0.6, 40.0], [0.0, 88.0], [0.6, 55.0]]}},
     )
 
 Each environment becomes one unit at one age (unit ``env_id % envs_per_age``,
@@ -32,6 +34,7 @@ from typing import Any
 import numpy as np
 
 from groot_eval.actuators.core import ActuatorParams, FaultTable, WearAwareActuatorCore, WearTable
+from groot_eval.actuators.drive_chain import DriveChain, DriveChainParams
 from groot_eval.actuators.motor_models import DCMotorSaturation, MLPMotorModel
 from groot_eval.degradation.faults import FaultConfig
 from groot_eval.degradation.wear import WearConfig
@@ -71,6 +74,17 @@ def build_core(cfg: Any, num_envs: int, num_joints: int, effort_limit: Any, stif
     return WearAwareActuatorCore(params, wear, faults, motor=motor, saturation=sat, noise_seed=int(cfg.fault_seed))
 
 
+def build_actuator(cfg: Any, num_envs: int, num_joints: int, effort_limit: Any, stiffness: Any, damping: Any,
+                   robot_wear: dict[str, Any] | None = None) -> WearAwareActuatorCore | DriveChain:
+    """The core, wrapped in a :class:`DriveChain` when ``cfg.drive_chain`` is set (delay, drops, current loop, linkage)."""
+    core = build_core(cfg, num_envs, num_joints, effort_limit, stiffness, damping, robot_wear)
+    chain = getattr(cfg, "drive_chain", None)
+    if not chain:
+        return core
+    params = DriveChainParams.from_dict({"dt": float(cfg.dt), "seed": int(cfg.fault_seed), **dict(chain)})
+    return DriveChain(core, params)
+
+
 if HAVE_ISAACLAB:  # pragma: no cover
 
     class WearAwareActuator(ActuatorBase):
@@ -85,8 +99,8 @@ if HAVE_ISAACLAB:  # pragma: no cover
                 from groot_eval.profiles import RobotProfile  # added by the calibration PR
 
                 robot_wear = RobotProfile.load(cfg.robot_profile).wear_for(self.joint_names)
-            self.core = build_core(cfg, self._num_envs, self.num_joints, self.effort_limit[0].tolist(),
-                                   self.stiffness[0].tolist(), self.damping[0].tolist(), robot_wear)
+            self.core = build_actuator(cfg, self._num_envs, self.num_joints, self.effort_limit[0].tolist(),
+                                       self.stiffness[0].tolist(), self.damping[0].tolist(), robot_wear)
 
         def reset(self, env_ids: Sequence[int]) -> None:
             ids = None if env_ids is None else np.asarray(list(env_ids) if not hasattr(env_ids, "cpu") else env_ids.cpu())
@@ -118,3 +132,4 @@ if HAVE_ISAACLAB:  # pragma: no cover
         coulomb_friction: float = 0.0
         viscous_friction: float = 0.0
         dt: float = 0.005
+        drive_chain: dict[str, Any] | None = None  # see groot_eval.actuators.drive_chain.DriveChainParams

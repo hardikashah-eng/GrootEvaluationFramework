@@ -65,6 +65,12 @@ Each failure goes through four stages:
 
 On the CPU test, the "robot" was Reach2D with hidden actuator gain 3.0 and 5 steps of delay. The baseline twin reproduced none of the failures. The knob search reproduced all of them and recovered gain 3.0 and delay 5 exactly, with replay nRMSE 0.000 at that setting.
 
+**When the twin still does not reproduce it:** run the engine cross-check
+(`groot_eval.engine_crosscheck.cross_check_case`). It replays the same failure, on the log's clock, in Isaac Sim and
+in MuJoCo, checks that each replay is repeatable and that each engine can hold the recorded state, and says whether
+the miss is the replay, an Isaac limitation, or a gap in the twin's model shared by both engines. See
+[twin-actuator-and-replay.md](twin-actuator-and-replay.md).
+
 Before acting on a twin ticket, confirm it on clean recordings with `groot-eval replay --config` (system identification). Tuning the twin to one failure is overfitting until the same setting also fits the robot's normal runs.
 
 Knob names must be scenario parameters the twin env accepts, plus `latency_mode` (any `--latency-mode` value). For Isaac Lab, map them through the adapter's `param_setters`. See `configs/repro/isaaclab_template.yaml`.
