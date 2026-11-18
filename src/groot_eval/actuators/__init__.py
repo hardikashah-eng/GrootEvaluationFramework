@@ -11,12 +11,15 @@ different unit at a different age, so one batched rollout sweeps a fleet.
 The core is written against the Python array API standard: the same code runs
 on NumPy (CPU, tested here) and on torch tensors (Isaac Lab, GPU).
 :mod:`groot_eval.actuators.isaaclab_actuator` wraps it as an Isaac Lab
-``ActuatorBase``.
+``ActuatorBase``. :class:`~groot_eval.actuators.drive_chain.DriveChain` adds the always-on effects (transport
+delay, dropped packets, current loop, linkage torque limit), and :mod:`groot_eval.actuators.identify` fits
+the model to stand tests and gates the fit.
 """
 
 from groot_eval.actuators.core import (ActuatorParams, FaultTable, WearAwareActuatorCore, WearTable,
                                        wear_at_age)
+from groot_eval.actuators.drive_chain import DriveChain, DriveChainParams
 from groot_eval.actuators.motor_models import DCMotorSaturation, MLPMotorModel
 
-__all__ = ["ActuatorParams", "DCMotorSaturation", "FaultTable", "MLPMotorModel", "WearAwareActuatorCore",
-           "WearTable", "wear_at_age"]
+__all__ = ["ActuatorParams", "DCMotorSaturation", "DriveChain", "DriveChainParams", "FaultTable", "MLPMotorModel",
+           "WearAwareActuatorCore", "WearTable", "wear_at_age"]

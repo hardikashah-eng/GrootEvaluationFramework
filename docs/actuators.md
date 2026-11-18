@@ -63,6 +63,17 @@ robot.actuators["legs"] = WearAwareActuatorCfg(
 Environments are split evenly across `ages_hours`. Resets restart the fault
 clock and cool the motors; wear stays, because it is the unit's age.
 
+## Drive chain and fitting to the real joint
+
+`DriveChain` (`groot_eval.actuators.drive_chain`) wraps the core with the effects every real drive has, not
+only when a fault fires: a per-environment transport delay with jitter, dropped packets (the drive holds the
+last command), a first-order current loop, and a torque limit that depends on joint angle for linkage-driven
+joints. In Isaac Lab, set `drive_chain={...}` on `WearAwareActuatorCfg`.
+
+`groot_eval.actuators.identify` fits the model to stand tests (steps, chirps, constant-velocity sweeps,
+reversals) and checks the fit with acceptance gates. See
+[twin-actuator-and-replay.md](twin-actuator-and-replay.md).
+
 ## Limits
 
 * **Not yet run inside Isaac Lab** (no GPU where this was written). The
@@ -72,5 +83,6 @@ clock and cool the motors; wear stays, because it is the unit's age.
   joint drive for an exact lock.
 * Backlash is modelled as a dead band on the position error, not as a
   separate motor-side state.
+* Joint compliance (series-elastic or harmonic-drive flex) is not modelled.
 * The wear numbers in `configs/wear/` are placeholders until fitted to your
   robots.
